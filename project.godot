@@ -13,15 +13,9 @@ _global_script_classes=[ {
 "class": "RegionUnpacker",
 "language": "GDScript",
 "path": "res://addons/SmartSlicer/Classes/RegionUnpacker.gd"
-}, {
-"base": "Reference",
-"class": "ShaderImageEffect",
-"language": "GDScript",
-"path": "res://Pixelorama Class/ShaderImageEffect.gd"
 } ]
 _global_script_class_icons={
-"RegionUnpacker": "",
-"ShaderImageEffect": ""
+"RegionUnpacker": ""
 }
 
 [application]
