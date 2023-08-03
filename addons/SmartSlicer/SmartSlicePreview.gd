@@ -28,9 +28,7 @@ func _draw() -> void:
 		draw_rect(scaled_rect, color, false)
 		# show number
 		draw_set_transform(_offset + scaled_rect.position, 0, Vector2.ONE)
-#		var font: Font = Control.new().get_font("font")
-		# replace with font used by pixelorama
-		var font: Font = Global.control.theme.default_font
+		var font: Font = Control.new().get_font("font")
 		var font_height := font.get_height()
 		draw_string(font, Vector2(1, font_height), str(i))
 		draw_set_transform(_offset, 0, Vector2.ONE)
