@@ -5,11 +5,10 @@ var _sliced_rects: Array
 var _stretch_amount: float
 var _offset: Vector2
 
+var color: Color = Color("6680ff")  # Set this to a theme color later
 
 func show_preview(sliced_rects: Array) -> void:
 	var image = get_parent().texture.get_data()
-	var aspect_ratio = image.get_size().x / image.get_size().y
-
 	if image.get_size().x > image.get_size().y:
 		_stretch_amount = rect_size.x / image.get_size().x
 	else:
@@ -26,10 +25,12 @@ func _draw() -> void:
 		var scaled_rect: Rect2 = rect
 		scaled_rect.position = (scaled_rect.position * _stretch_amount)
 		scaled_rect.size *= _stretch_amount
-		draw_rect(scaled_rect, Color("6680ff"), false)
+		draw_rect(scaled_rect, color, false)
 		# show number
 		draw_set_transform(_offset + scaled_rect.position, 0, Vector2.ONE)
-		var font: Font = Control.new().get_font("font")
+#		var font: Font = Control.new().get_font("font")
+		# replace with font used by pixelorama
+		var font: Font = Global.control.theme.default_font
 		var font_height := font.get_height()
 		draw_string(font, Vector2(1, font_height), str(i))
 		draw_set_transform(_offset, 0, Vector2.ONE)
