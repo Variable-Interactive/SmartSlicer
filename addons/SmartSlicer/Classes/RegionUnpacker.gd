@@ -28,7 +28,7 @@ func get_used_rects(image: Image) -> Dictionary:
 	else:  # Multi-threaded mode
 		if slice_thread.is_started():
 			slice_thread.wait_to_finish()
-		var error = slice_thread.start(get_rects.bind(image))
+		var error := slice_thread.start(get_rects.bind(image))
 		if error == OK:
 			return slice_thread.wait_to_finish()
 		else:
@@ -37,42 +37,42 @@ func get_used_rects(image: Image) -> Dictionary:
 
 func get_rects(image: Image) -> Dictionary:
 	# make a smaller image to make the loop shorter
-	var used_rect = image.get_used_rect()
+	var used_rect := image.get_used_rect()
 	if used_rect.size == Vector2i.ZERO:
 		return clean_rects([])
-	var test_image = image.get_region(used_rect)
+	var test_image := image.get_region(used_rect)
 	# prepare a bitmap to keep track of previous places
 	var scanned_area := BitMap.new()
 	scanned_area.create(test_image.get_size())
 	# Scan the image
-	var rects = []
-	var frame_size = Vector2.ZERO
+	var rects: Array[Rect2i] = []
+	var frame_size := Vector2i.ZERO
 	for y in test_image.get_size().y:
 		for x in test_image.get_size().x:
-			var position = Vector2(x, y)
+			var position := Vector2i(x, y)
 			if test_image.get_pixelv(position).a > 0:  # used portion of image detected
 				if !scanned_area.get_bitv(position):
 					var rect := _estimate_rect(test_image, position)
 					scanned_area.set_bit_rect(rect, true)
 					rect.position += used_rect.position
 					rects.append(rect)
-	var rects_info = clean_rects(rects)
-	rects_info["rects"].sort_custom(Callable(self, "sort_rects"))
+	var rects_info := clean_rects(rects)
+	rects_info["rects"].sort_custom(sort_rects)
 	return rects_info
 
 
-func clean_rects(rects: Array) -> Dictionary:
-	var frame_size = Vector2.ZERO
+func clean_rects(rects: Array[Rect2i]) -> Dictionary:
+	var frame_size := Vector2i.ZERO
 	for i in rects.size():
-		var target: Rect2 = rects.pop_front()
-		var test_rect = target
+		var target: Rect2i = rects.pop_front()
+		var test_rect := target
 		if (
 			target.size.x < _include_boundary_threshold
 			or target.size.y < _include_boundary_threshold
 		):
-			test_rect.size += Vector2(_merge_dist, _merge_dist)
-			test_rect.position -= Vector2(_merge_dist, _merge_dist) / 2
-		var merged = false
+			test_rect.size += Vector2i(_merge_dist, _merge_dist)
+			test_rect.position -= Vector2i(_merge_dist, _merge_dist) / 2
+		var merged := false
 		for rect_i in rects.size():
 			if test_rect.intersects(rects[rect_i]):
 				rects[rect_i] = target.merge(rects[rect_i])
@@ -89,15 +89,15 @@ func clean_rects(rects: Array) -> Dictionary:
 	return {"rects": rects, "frame_size": frame_size}
 
 
-func sort_rects(rect_a: Rect2, rect_b: Rect2) -> bool:
+func sort_rects(rect_a: Rect2i, rect_b: Rect2i) -> bool:
 	# After many failed attempts, this version works for some reason (it's best not to disturb it)
 	if rect_a.end.y < rect_b.position.y:
 		return true
 	if rect_a.position.x < rect_b.position.x:
 		# if both lie in the same row
-		var start = rect_a.position
-		var size = Vector2(rect_b.end.x, rect_a.end.y)
-		if Rect2(start, size).intersects(rect_b):
+		var start := rect_a.position
+		var size := Vector2i(rect_b.end.x, rect_a.end.y)
+		if Rect2i(start, size).intersects(rect_b):
 			return true
 	return false
 
@@ -105,7 +105,7 @@ func sort_rects(rect_a: Rect2, rect_b: Rect2) -> bool:
 func _estimate_rect(image: Image, position: Vector2) -> Rect2i:
 	var cel_image := Image.new()
 	cel_image.copy_from(image)
-	var small_rect: Rect2i = _flood_fill(position, cel_image)
+	var small_rect := _flood_fill(position, cel_image)
 	return small_rect
 
 
@@ -236,7 +236,7 @@ func _select_segments(map: Image) -> void:
 	# short circuit for flat colors
 	for c in _allegro_image_segments.size():
 		var p = _allegro_image_segments[c]
-		var rect = Rect2()
-		rect.position = Vector2(p.left_position, p.y)
-		rect.end = Vector2(p.right_position + 1, p.y + 1)
+		var rect := Rect2i()
+		rect.position = Vector2i(p.left_position, p.y)
+		rect.end = Vector2i(p.right_position + 1, p.y + 1)
 		map.fill_rect(rect, Color.WHITE)

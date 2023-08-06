@@ -1,14 +1,14 @@
 extends Control
 
-# add this as a child of the texturerect that contains the main spritesheet
-var color: Color = Color("6680ff")  # Set this to a theme color later
-var _sliced_rects: Array
+# Add this as a child of the texturerect that contains the main spritesheet
+var color := Color("6680ff")  # Set this to a theme color later
+var _sliced_rects: Array[Rect2i]
 var _stretch_amount: float
 var _offset: Vector2
 
 
-func show_preview(sliced_rects: Array) -> void:
-	var image = get_parent().texture.get_image()
+func show_preview(sliced_rects: Array[Rect2i]) -> void:
+	var image: Image = get_parent().texture.get_image()
 	if image.get_size().x > image.get_size().y:
 		_stretch_amount = size.x / image.get_size().x
 	else:
@@ -21,7 +21,7 @@ func show_preview(sliced_rects: Array) -> void:
 func _draw() -> void:
 	draw_set_transform(_offset, 0, Vector2.ONE)
 	for i in _sliced_rects.size():
-		var rect = _sliced_rects[i]
+		var rect := _sliced_rects[i]
 		var scaled_rect: Rect2 = rect
 		scaled_rect.position = (scaled_rect.position * _stretch_amount)
 		scaled_rect.size *= _stretch_amount
