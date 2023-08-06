@@ -1,7 +1,7 @@
 extends Control
+## Add this as a child of the texturerect that contains the main spritesheet
 
-# Add this as a child of the texturerect that contains the main spritesheet
-var color := Color("6680ff")  # Set this to a theme color later
+var color := Color("6680ff")  ## Set this to a theme color later
 var _sliced_rects: Array[Rect2i]
 var _stretch_amount: float
 var _offset: Vector2
