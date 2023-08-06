@@ -1,5 +1,5 @@
 class_name RegionUnpacker
-extends Reference
+extends RefCounted
 
 # THIS CLASS TAKES INSPIRATION FROM PIXELORAMA'S FLOOD FILL
 # AND HAS BEEN MODIFIED FOR OPTIMIZATION
@@ -22,32 +22,28 @@ func _init(threshold: int, merge_dist: int) -> void:
 
 
 func get_used_rects(image: Image) -> Dictionary:
-	if OS.get_name() == "HTML5":
+	if ProjectSettings.get_setting("rendering/driver/threads/thread_model") != 2:
+		# Single-threaded mode
 		return get_rects(image)
-	else:
-		# If Thread model is set to "Multi-Threaded" in project settings>threads>thread model
-		if slice_thread.is_active():
+	else:  # Multi-threaded mode
+		if slice_thread.is_started():
 			slice_thread.wait_to_finish()
-		var error = slice_thread.start(self, "get_rects", image)
+		var error = slice_thread.start(get_rects.bind(image))
 		if error == OK:
 			return slice_thread.wait_to_finish()
 		else:
 			return get_rects(image)
-		# If Thread model is set to "Single-Safe" in project settings>threads>thread model then
-		# comment the above code and uncomment below
-		#return get_rects({"image": image})
 
 
 func get_rects(image: Image) -> Dictionary:
 	# make a smaller image to make the loop shorter
 	var used_rect = image.get_used_rect()
-	if used_rect.size == Vector2.ZERO:
+	if used_rect.size == Vector2i.ZERO:
 		return clean_rects([])
-	var test_image = image.get_rect(used_rect)
+	var test_image = image.get_region(used_rect)
 	# prepare a bitmap to keep track of previous places
 	var scanned_area := BitMap.new()
 	scanned_area.create(test_image.get_size())
-	test_image.lock()
 	# Scan the image
 	var rects = []
 	var frame_size = Vector2.ZERO
@@ -55,14 +51,13 @@ func get_rects(image: Image) -> Dictionary:
 		for x in test_image.get_size().x:
 			var position = Vector2(x, y)
 			if test_image.get_pixelv(position).a > 0:  # used portion of image detected
-				if !scanned_area.get_bit(position):
+				if !scanned_area.get_bitv(position):
 					var rect := _estimate_rect(test_image, position)
 					scanned_area.set_bit_rect(rect, true)
 					rect.position += used_rect.position
 					rects.append(rect)
-	test_image.unlock()
 	var rects_info = clean_rects(rects)
-	rects_info["rects"].sort_custom(self, "sort_rects")
+	rects_info["rects"].sort_custom(Callable(self, "sort_rects"))
 	return rects_info
 
 
@@ -107,12 +102,10 @@ func sort_rects(rect_a: Rect2, rect_b: Rect2) -> bool:
 	return false
 
 
-func _estimate_rect(image: Image, position: Vector2) -> Rect2:
+func _estimate_rect(image: Image, position: Vector2) -> Rect2i:
 	var cel_image := Image.new()
 	cel_image.copy_from(image)
-	cel_image.lock()
-	var small_rect: Rect2 = _flood_fill(position, cel_image)
-	cel_image.unlock()
+	var small_rect: Rect2i = _flood_fill(position, cel_image)
 	return small_rect
 
 
@@ -198,7 +191,7 @@ func _check_flooded_segment(y: int, left: int, right: int, image: Image) -> bool
 	return ret
 
 
-func _flood_fill(position: Vector2, image: Image) -> Rect2:
+func _flood_fill(position: Vector2, image: Image) -> Rect2i:
 	# implements the floodfill routine by Shawn Hargreaves
 	# from https://www1.udel.edu/CIS/software/dist/allegro-4.2.1/src/flood.c
 	# init flood data structures
@@ -210,10 +203,8 @@ func _flood_fill(position: Vector2, image: Image) -> Rect2:
 
 	var final_image = Image.new()
 	final_image.copy_from(image)
-	final_image.fill(Color.transparent)
-	final_image.lock()
+	final_image.fill(Color.TRANSPARENT)
 	_select_segments(final_image)
-	final_image.unlock()
 
 	return final_image.get_used_rect()
 
@@ -248,4 +239,4 @@ func _select_segments(map: Image) -> void:
 		var rect = Rect2()
 		rect.position = Vector2(p.left_position, p.y)
 		rect.end = Vector2(p.right_position + 1, p.y + 1)
-		map.fill_rect(rect, Color.white)
+		map.fill_rect(rect, Color.WHITE)

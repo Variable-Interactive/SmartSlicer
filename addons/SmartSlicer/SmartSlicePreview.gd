@@ -8,14 +8,14 @@ var _offset: Vector2
 
 
 func show_preview(sliced_rects: Array) -> void:
-	var image = get_parent().texture.get_data()
+	var image = get_parent().texture.get_image()
 	if image.get_size().x > image.get_size().y:
-		_stretch_amount = rect_size.x / image.get_size().x
+		_stretch_amount = size.x / image.get_size().x
 	else:
-		_stretch_amount = rect_size.y / image.get_size().y
+		_stretch_amount = size.y / image.get_size().y
 	_sliced_rects = sliced_rects.duplicate()
-	_offset = (0.5 * (rect_size - (image.get_size() * _stretch_amount))).floor()
-	update()
+	_offset = (0.5 * (size - (image.get_size() * _stretch_amount))).floor()
+	queue_redraw()
 
 
 func _draw() -> void:
@@ -28,7 +28,7 @@ func _draw() -> void:
 		draw_rect(scaled_rect, color, false)
 		# show number
 		draw_set_transform(_offset + scaled_rect.position, 0, Vector2.ONE)
-		var font: Font = Control.new().get_font("font")
+		var font: Font = Control.new().get_theme_font("font")
 		var font_height := font.get_height()
 		draw_string(font, Vector2(1, font_height), str(i))
 		draw_set_transform(_offset, 0, Vector2.ONE)

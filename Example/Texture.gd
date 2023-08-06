@@ -6,10 +6,9 @@ var rect_data: Dictionary
 func _on_Button_pressed() -> void:
 	var time = Time.get_ticks_usec()
 	var unpak := RegionUnpacker.new(10, 3)
-	rect_data = unpak.get_used_rects(texture.get_data())
+	rect_data = unpak.get_used_rects(texture.get_image())
 	$Control.show_preview(rect_data["rects"])
 	print(Time.get_ticks_usec() - time)
-
 
 
 func _on_Texture_item_rect_changed() -> void:
