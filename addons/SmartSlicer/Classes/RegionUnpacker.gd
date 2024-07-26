@@ -128,7 +128,7 @@ func get_rects(image: Image, lazy_check := false, scan_dir := LEFT_TO_RIGHT) -> 
 
 func clean_rects(rects: Array[Rect2i]) -> RectData:
 	var frame_size := Vector2i.ZERO
-	for i in rects.size():
+	for i: int in rects.size():
 		var target: Rect2i = rects.pop_front()
 		var test_rect := target
 		if (
@@ -138,7 +138,7 @@ func clean_rects(rects: Array[Rect2i]) -> RectData:
 			test_rect.size += Vector2i(_merge_dist, _merge_dist)
 			test_rect.position -= Vector2i(_merge_dist, _merge_dist) / 2
 		var merged := false
-		for rect_i in rects.size():
+		for rect_i: int in rects.size():
 			if test_rect.intersects(rects[rect_i]):
 				rects[rect_i] = target.merge(rects[rect_i])
 				merged = true
@@ -257,7 +257,6 @@ func _flood_fill(position: Vector2i, image: Image) -> Rect2i:
 	_compute_segments_for_image(position, image)
 	# now actually color the image: since we have already checked a few things for the points
 	# we'll process here, we're going to skip a bunch of safety checks to speed things up.
-
 	return _select_segments()
 
 
