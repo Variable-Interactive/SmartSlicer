@@ -12,7 +12,7 @@ config_version=5
 
 config/name="SmartSlicer"
 run/main_scene="res://Example/Texture.tscn"
-config/features=PackedStringArray("4.1")
+config/features=PackedStringArray("4.2")
 
 [display]
 
