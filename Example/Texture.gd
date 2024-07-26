@@ -2,13 +2,17 @@ extends TextureRect
 
 var rect_data: RegionUnpacker.RectData
 
-# roughly 665886 with old imp
+## This example will profile process times as we increase skip_amount
+## with each click
 func _on_Button_pressed() -> void:
-	var time = Time.get_ticks_usec()
-	var unpak := RegionUnpacker.new(10, 3)
-	rect_data = unpak.get_used_rects(texture.get_image())
+	var avg_time = 0
+	for i in 20:
+		var time = Time.get_ticks_msec()
+		var unpak := RegionUnpacker.new(10, 3)
+		rect_data = unpak.get_used_rects(texture.get_image())
+		avg_time += Time.get_ticks_msec() - time
+	print("Average time for 10 samples is: ", avg_time/(20.0), " Milli Seconds")
 	$Control.show_preview(rect_data.rects)
-	print(Time.get_ticks_usec() - time)
 
 
 func _on_Texture_item_rect_changed() -> void:
