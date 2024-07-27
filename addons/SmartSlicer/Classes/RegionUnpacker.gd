@@ -1,8 +1,9 @@
 class_name RegionUnpacker
 extends RefCounted
-enum {LEFT_TO_RIGHT, TOP_TO_BOTTOM}
 # THIS CLASS TAKES INSPIRATION FROM PIXELORAMA'S FLOOD FILL
 # AND HAS BEEN MODIFIED FOR OPTIMIZATION
+
+enum {LEFT_TO_RIGHT, TOP_TO_BOTTOM}
 
 var slice_thread := Thread.new()
 
