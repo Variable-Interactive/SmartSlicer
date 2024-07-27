@@ -3,7 +3,7 @@ extends RefCounted
 # THIS CLASS TAKES INSPIRATION FROM PIXELORAMA'S FLOOD FILL
 # AND HAS BEEN MODIFIED FOR OPTIMIZATION
 
-enum {LEFT_TO_RIGHT, TOP_TO_BOTTOM}
+enum {DETECT_VERTICAL_EMPTY_LINES, DETECT_HORIZONTAL_EMPTY_LINES}
 
 var slice_thread := Thread.new()
 
@@ -45,7 +45,7 @@ func _init(threshold: int, merge_dist: int) -> void:
 	_merge_dist = merge_dist
 
 
-func get_used_rects(image: Image, lazy_check := false, scan_dir := LEFT_TO_RIGHT) -> RectData:
+func get_used_rects(image: Image, lazy_check := false, scan_dir := DETECT_VERTICAL_EMPTY_LINES) -> RectData:
 	if ProjectSettings.get_setting("rendering/driver/threads/thread_model") != 2:
 		# Single-threaded mode
 		return get_rects(image, lazy_check, scan_dir)
@@ -59,7 +59,7 @@ func get_used_rects(image: Image, lazy_check := false, scan_dir := LEFT_TO_RIGHT
 			return get_rects(image, lazy_check, scan_dir)
 
 
-func get_rects(image: Image, lazy_check := false, scan_dir := LEFT_TO_RIGHT) -> RectData:
+func get_rects(image: Image, lazy_check := false, scan_dir := DETECT_VERTICAL_EMPTY_LINES) -> RectData:
 	var skip_amount = 0
 	# Make a smaller image to make the loop shorter
 	var used_rect := image.get_used_rect()
@@ -80,17 +80,17 @@ func get_rects(image: Image, lazy_check := false, scan_dir := LEFT_TO_RIGHT) -> 
 	var side_a: int
 	var side_b: int
 	match scan_dir:
-		LEFT_TO_RIGHT:
+		DETECT_VERTICAL_EMPTY_LINES:
 			side_a = test_image.get_size().x
 			side_b = test_image.get_size().y
-		TOP_TO_BOTTOM:
+		DETECT_HORIZONTAL_EMPTY_LINES:
 			side_a = test_image.get_size().y
 			side_b = test_image.get_size().x
 	var line := 0
 	while line < side_a:
 		for element: int in side_b:
 			var position := Vector2i(line, element)
-			if scan_dir == TOP_TO_BOTTOM:
+			if scan_dir == DETECT_HORIZONTAL_EMPTY_LINES:
 				position = Vector2i(element, line)
 			if test_image.get_pixelv(position).a > 0:  # used portion of image detected
 				found_pixels_this_line = true
