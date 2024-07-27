@@ -262,7 +262,7 @@ func _flood_fill(position: Vector2i, image: Image) -> Rect2i:
 
 func _compute_segments_for_image(position: Vector2i, image: Image) -> void:
 	# initially allocate at least 1 segment per line of image
-	for j in image.get_height():
+	for j: int in image.get_height():
 		_add_new_segment(j)
 	# start flood algorithm
 	_flood_line_around_point(position, image)
@@ -271,7 +271,7 @@ func _compute_segments_for_image(position: Vector2i, image: Image) -> void:
 	while not done:
 		done = true
 		var max_index := _allegro_flood_segments.size()
-		for c in max_index:
+		for c: int in max_index:
 			var p := _allegro_flood_segments[c]
 			if p.todo_below:  # check below the segment?
 				p.todo_below = false
@@ -286,7 +286,7 @@ func _compute_segments_for_image(position: Vector2i, image: Image) -> void:
 func _select_segments() -> Rect2i:
 	# short circuit for flat colors
 	var used_rect := Rect2i()
-	for c in _allegro_image_segments.size():
+	for c: int in _allegro_image_segments.size():
 		var p := _allegro_image_segments[c]
 		var rect := Rect2i()
 		rect.position = Vector2i(p.left_position, p.y)
